@@ -1,3 +1,4 @@
+import { PageIntro } from '#/components/page-intro'
 import { seo } from '#/libs/seo'
 import {
   Button,
@@ -82,11 +83,10 @@ function RouteComponent() {
 
   return (
     <div style={{ maxWidth: 640, padding: '1rem' }}>
-      <h1>XLS 轉換工具</h1>
-      <p>
-        把早期 Excel建立的 .xls檔案轉換成 Office 2007之後的 .xlsx檔案 或
-        OpenDocument Spreadsheet的 .ods檔案
-      </p>
+      <PageIntro
+        title="XLS 轉換工具"
+        description="把早期 Excel建立的 .xls檔案轉換成 Office 2007之後的 .xlsx檔案 或 OpenDocument Spreadsheet的 .ods檔案"
+      />
 
       <input
         ref={inputRef}

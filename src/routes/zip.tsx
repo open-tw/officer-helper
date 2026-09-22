@@ -1,3 +1,4 @@
+import { PageIntro } from '#/components/page-intro'
 import { seo } from '#/libs/seo'
 import { Button, Field, Input, Spinner, Text } from '@fluentui/react-components'
 import {
@@ -72,9 +73,8 @@ function RouteComponent() {
     setError(null)
     setProgress(0)
     try {
-      const { BlobReader, BlobWriter, ZipWriter } = await import(
-        '@zip.js/zip.js'
-      )
+      const { BlobReader, BlobWriter, ZipWriter } =
+        await import('@zip.js/zip.js')
       const writer = new ZipWriter(new BlobWriter('application/zip'))
       const total = files.reduce((sum, f) => sum + f.size, 0) || 1
       let done = 0
@@ -108,8 +108,10 @@ function RouteComponent() {
 
   return (
     <div style={{ maxWidth: 640, padding: '1rem' }}>
-      <h1>壓一起</h1>
-      <p>選擇多個檔案，在瀏覽器內打包成一個 .zip 檔案下載。</p>
+      <PageIntro
+        title="壓一起"
+        description="選擇多個檔案，在瀏覽器內打包成一個 .zip 檔案下載。"
+      />
 
       <input
         ref={inputRef}

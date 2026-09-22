@@ -1,0 +1,4 @@
+/* 只放 Fluent 管不到的全域重設，其餘樣式用 makeStyles */
+body {
+  margin: 0;
+}
