@@ -2,6 +2,7 @@ import type { FluentIcon } from '@fluentui/react-icons'
 import {
   ArrowSyncRegular,
   FolderZipRegular,
+  ImageRegular,
   QrCodeRegular,
 } from '@fluentui/react-icons'
 import type { FileRouteTypes } from '#/routeTree.gen'
@@ -37,6 +38,12 @@ export const TOOL_GROUPS: ToolGroup[] = [
         title: '壓一起',
         description: '把多個檔案打包成一個 .zip，方便寄送或上傳',
         icon: FolderZipRegular,
+      },
+      {
+        to: '/img/compressor',
+        title: '圖片壓縮',
+        description: '縮小照片檔案大小，方便夾帶在信件或上傳系統',
+        icon: ImageRegular,
       },
     ],
   },

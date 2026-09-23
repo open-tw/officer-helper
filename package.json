@@ -21,6 +21,7 @@
     "@tanstack/react-router": "latest",
     "@tanstack/react-router-devtools": "latest",
     "@zip.js/zip.js": "^2.15.0",
+    "browser-image-compression": "^2.0.2",
     "next-themes": "^0.4.6",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",

@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as QrCodeRouteImport } from './routes/qr-code'
 import { Route as ZipRouteImport } from './routes/zip'
 import { Route as ExportXlsRouteImport } from './routes/export/xls'
+import { Route as ImgCompressorRouteImport } from './routes/img/compressor'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -34,18 +35,25 @@ const ExportXlsRoute = ExportXlsRouteImport.update({
   path: '/export/xls',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ImgCompressorRoute = ImgCompressorRouteImport.update({
+  id: '/img/compressor',
+  path: '/img/compressor',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/qr-code': typeof QrCodeRoute
   '/zip': typeof ZipRoute
   '/export/xls': typeof ExportXlsRoute
+  '/img/compressor': typeof ImgCompressorRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/qr-code': typeof QrCodeRoute
   '/zip': typeof ZipRoute
   '/export/xls': typeof ExportXlsRoute
+  '/img/compressor': typeof ImgCompressorRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -53,13 +61,14 @@ export interface FileRoutesById {
   '/qr-code': typeof QrCodeRoute
   '/zip': typeof ZipRoute
   '/export/xls': typeof ExportXlsRoute
+  '/img/compressor': typeof ImgCompressorRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/qr-code' | '/zip' | '/export/xls'
+  fullPaths: '/' | '/qr-code' | '/zip' | '/export/xls' | '/img/compressor'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/qr-code' | '/zip' | '/export/xls'
-  id: '__root__' | '/' | '/qr-code' | '/zip' | '/export/xls'
+  to: '/' | '/qr-code' | '/zip' | '/export/xls' | '/img/compressor'
+  id: '__root__' | '/' | '/qr-code' | '/zip' | '/export/xls' | '/img/compressor'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -67,6 +76,7 @@ export interface RootRouteChildren {
   QrCodeRoute: typeof QrCodeRoute
   ZipRoute: typeof ZipRoute
   ExportXlsRoute: typeof ExportXlsRoute
+  ImgCompressorRoute: typeof ImgCompressorRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -99,6 +109,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ExportXlsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/img/compressor': {
+      id: '/img/compressor'
+      path: '/img/compressor'
+      fullPath: '/img/compressor'
+      preLoaderRoute: typeof ImgCompressorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -107,6 +124,7 @@ const rootRouteChildren: RootRouteChildren = {
   QrCodeRoute: QrCodeRoute,
   ZipRoute: ZipRoute,
   ExportXlsRoute: ExportXlsRoute,
+  ImgCompressorRoute: ImgCompressorRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
