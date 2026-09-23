@@ -6,11 +6,12 @@
 
 ## 工具一覽
 
-| 工具           | 路徑          | 說明                                                  |
-| -------------- | ------------- | ----------------------------------------------------- |
-| QR Code 產生器 | `/qr-code`    | 輸入網址或文字產生 QR Code，可選容錯率，下載成 PNG    |
-| 壓一起         | `/zip`        | 選取或拖曳多個檔案，打包成單一 `.zip` 下載            |
-| XLS 轉換       | `/export/xls` | 把舊版 Excel 的 `.xls` 轉成 `.xlsx`、`.ods` 或 `.csv` |
+| 工具           | 路徑              | 說明                                                  |
+| -------------- | ----------------- | ----------------------------------------------------- |
+| QR Code 產生器 | `/qr-code`        | 輸入網址或文字產生 QR Code，可選容錯率，下載成 PNG    |
+| 壓一起         | `/zip`            | 選取或拖曳多個檔案，打包成單一 `.zip` 下載            |
+| 圖片壓縮       | `/img/compressor` | 批次縮小圖片檔案大小，可單張下載或打包成 `.zip`       |
+| XLS 轉換       | `/export/xls`     | 把舊版 Excel 的 `.xls` 轉成 `.xlsx`、`.ods` 或 `.csv` |
 
 ## 開發
 
@@ -42,42 +43,53 @@ npm run dev      # http://localhost:3000
 - **[Fluent UI v9](https://react.fluentui.dev/)** — UI 元件，配合 Office 使用者習慣
 - **[SheetJS](https://sheetjs.com/)** — 試算表格式轉換
 - **[zip.js](https://github.com/gildas-lormeau/zip.js)** — 瀏覽器端壓縮
+- **[browser-image-compression](https://github.com/Donaldcwl/browser-image-compression)** — 圖片壓縮
 
 > `xlsx` 這個套件是從 SheetJS 官方 CDN 安裝（不是 npm registry），這是官方建議的做法。若建置環境無法連外或使用內部 registry，需要先處理這個依賴。
+
+> `browser-image-compression` 在 Web Worker 內預設會從 jsDelivr 載入自己。本專案已改為載入站內副本（`src/routes/img/compressor.tsx` 的 `libURL`），因此執行時不會對外連線，內網環境也能正常運作。
 
 ## 專案結構
 
 ```
 src/
-├── routes/              # 檔案式路由，檔名即網址
-│   ├── __root.tsx       # 共用外層（FluentProvider 在這裡）
-│   ├── index.tsx        # 首頁工具選單
+├── routes/                  # 檔案式路由，檔名即網址
+│   ├── __root.tsx           # 共用外層（FluentProvider 與頁首在這裡）
+│   ├── index.tsx            # 首頁，卡片由 libs/tools.ts 自動產生
 │   ├── qr-code.tsx
 │   ├── zip.tsx
+│   ├── img/compressor.tsx
 │   └── export/xls.tsx
-├── libs/seo.ts          # 產生頁面 meta 標籤
-├── routeTree.gen.ts     # 自動產生，不要手動改
-└── main.tsx             # 進入點，router 在這裡建立
+├── components/              # 跨頁共用元件（PageIntro、ColorPickerPopup）
+├── libs/
+│   ├── tools.ts             # 工具清單的單一來源，首頁讀這裡
+│   └── seo.ts               # 產生頁面 meta 標籤
+├── routeTree.gen.ts         # 自動產生，不要手動改
+├── router.tsx               # router 設定（basepath 在這裡）
+└── main.tsx                 # 進入點
 ```
 
-新增工具：在 `src/routes/` 放一個新的 `.tsx`，開發伺服器會自動更新 `routeTree.gen.ts`，接著在 `src/routes/index.tsx` 的選單加上入口。
+新增工具分兩步：
+
+1. 在 `src/routes/` 放一個新的 `.tsx`，開發伺服器會自動更新 `routeTree.gen.ts`
+2. 在 `src/libs/tools.ts` 的 `TOOL_GROUPS` 加一筆，首頁就會自動出現對應卡片
 
 ## 部署
 
 建置產物是純靜態檔案，`dist/` 直接丟到任何靜態主機即可。但有兩件事必須先確認：
 
-### 1. 部署在子路徑時要設定 `base`
+### 1. 部署在子路徑時要設定 `VITE_BASE_PATH`
 
-預設產出的資產路徑是絕對路徑（`/assets/...`），只適用於放在網域根目錄。若要放在子路徑（例如 `example.gov.tw/officer-helper/`），必須在 `vite.config.ts` 設定：
+預設產出的資產路徑是絕對路徑（`/assets/...`），只適用於放在網域根目錄。若要放在子路徑（例如 `example.gov.tw/officer-helper/`），建置前設定環境變數即可：
 
-```ts
-const config = defineConfig({
-  base: '/officer-helper/',
-  // ...
-})
+```bash
+# .env.production
+VITE_BASE_PATH=/officer-helper/
 ```
 
-並在 `src/main.tsx` 的 `createRouter` 加上對應的 `basepath`，否則路由會對不上。
+頭尾斜線會自動補齊，填 `officer-helper` 或 `/officer-helper` 也可以。未設定時就是根路徑。
+
+`vite.config.ts` 的 `base` 與 `src/router.tsx` 的 `basepath` 都讀這個值，不需要分別修改。可參考 `.env.example`。
 
 ### 2. 伺服器必須設定 history fallback
 
@@ -95,4 +107,12 @@ location / {
 ```apache
 # Apache
 FallbackResource /index.html
+```
+
+部署在子路徑時，fallback 的目標要跟著改成該路徑下的 `index.html`：
+
+```nginx
+location /officer-helper/ {
+  try_files $uri $uri/ /officer-helper/index.html;
+}
 ```
