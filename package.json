@@ -11,6 +11,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "lint": "eslint",
+    "test:poster": "node --experimental-strip-types --test tests/pdf-poster.test.ts tests/pdf-poster-render.test.ts",
     "format": "prettier --write . && eslint --fix",
     "check": "prettier --check ."
   },
@@ -23,6 +24,8 @@
     "@zip.js/zip.js": "^2.15.0",
     "browser-image-compression": "^2.0.2",
     "next-themes": "^0.4.6",
+    "pdf-lib": "^1.17.1",
+    "pdfjs-dist": "^6.3.289",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-qr-code": "^2.2.0",
