@@ -12,10 +12,11 @@
 | 壓一起         | `/zip`            | 選取或拖曳多個檔案，打包成單一 `.zip` 下載            |
 | 圖片壓縮       | `/img/compressor` | 批次縮小圖片檔案大小，可單張下載或打包成 `.zip`       |
 | XLS 轉換       | `/export/xls`     | 把舊版 Excel 的 `.xls` 轉成 `.xlsx`、`.ods` 或 `.csv` |
+| 海報分割列印   | `/pdf/poster`     | 將 PDF 放大成 2／4／8 張 A4 或 A3，列印後拼貼         |
 
 ## 開發
 
-需要 Node.js 20 以上。
+建議使用 Node.js 24；PDF.js 需要 Node.js 22.13 以上的相容版本。
 
 ```bash
 npm install
@@ -30,6 +31,7 @@ npm run dev      # http://localhost:3000
 | `npm run build`           | 建置到 `dist/`                    |
 | `npm run preview`         | 在本機預覽建置結果                |
 | `npm run lint`            | ESLint 檢查                       |
+| `npm run test:poster`     | 海報排版、PDF 輸出及渲染比對測試  |
 | `npm run format`          | Prettier 格式化並自動修正 ESLint  |
 | `npm run check`           | 只檢查格式，不修改檔案（適合 CI） |
 | `npm run generate-routes` | 手動重新產生路由檔                |
@@ -44,6 +46,8 @@ npm run dev      # http://localhost:3000
 - **[SheetJS](https://sheetjs.com/)** — 試算表格式轉換
 - **[zip.js](https://github.com/gildas-lormeau/zip.js)** — 瀏覽器端壓縮
 - **[browser-image-compression](https://github.com/Donaldcwl/browser-image-compression)** — 圖片壓縮
+- **[pdf-lib](https://pdf-lib.js.org/)** — PDF 海報分割輸出
+- **[PDF.js](https://mozilla.github.io/pdf.js/)** — PDF 預覽；渲染測試使用其可選依賴 `@napi-rs/canvas`，安裝時請保留 optional dependencies
 
 > `xlsx` 這個套件是從 SheetJS 官方 CDN 安裝（不是 npm registry），這是官方建議的做法。若建置環境無法連外或使用內部 registry，需要先處理這個依賴。
 
@@ -59,6 +63,7 @@ src/
 │   ├── qr-code.tsx
 │   ├── zip.tsx
 │   ├── img/compressor.tsx
+│   ├── pdf/poster.tsx
 │   └── export/xls.tsx
 ├── components/              # 跨頁共用元件（PageIntro、ColorPickerPopup）
 ├── libs/
