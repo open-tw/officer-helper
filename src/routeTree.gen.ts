@@ -14,6 +14,7 @@ import { Route as QrCodeRouteImport } from './routes/qr-code'
 import { Route as ZipRouteImport } from './routes/zip'
 import { Route as ExportXlsRouteImport } from './routes/export/xls'
 import { Route as ImgCompressorRouteImport } from './routes/img/compressor'
+import { Route as PdfPosterRouteImport } from './routes/pdf/poster'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -40,6 +41,11 @@ const ImgCompressorRoute = ImgCompressorRouteImport.update({
   path: '/img/compressor',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PdfPosterRoute = PdfPosterRouteImport.update({
+  id: '/pdf/poster',
+  path: '/pdf/poster',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -47,6 +53,7 @@ export interface FileRoutesByFullPath {
   '/zip': typeof ZipRoute
   '/export/xls': typeof ExportXlsRoute
   '/img/compressor': typeof ImgCompressorRoute
+  '/pdf/poster': typeof PdfPosterRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -54,6 +61,7 @@ export interface FileRoutesByTo {
   '/zip': typeof ZipRoute
   '/export/xls': typeof ExportXlsRoute
   '/img/compressor': typeof ImgCompressorRoute
+  '/pdf/poster': typeof PdfPosterRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -62,13 +70,33 @@ export interface FileRoutesById {
   '/zip': typeof ZipRoute
   '/export/xls': typeof ExportXlsRoute
   '/img/compressor': typeof ImgCompressorRoute
+  '/pdf/poster': typeof PdfPosterRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/qr-code' | '/zip' | '/export/xls' | '/img/compressor'
+  fullPaths:
+    | '/'
+    | '/qr-code'
+    | '/zip'
+    | '/export/xls'
+    | '/img/compressor'
+    | '/pdf/poster'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/qr-code' | '/zip' | '/export/xls' | '/img/compressor'
-  id: '__root__' | '/' | '/qr-code' | '/zip' | '/export/xls' | '/img/compressor'
+  to:
+    | '/'
+    | '/qr-code'
+    | '/zip'
+    | '/export/xls'
+    | '/img/compressor'
+    | '/pdf/poster'
+  id:
+    | '__root__'
+    | '/'
+    | '/qr-code'
+    | '/zip'
+    | '/export/xls'
+    | '/img/compressor'
+    | '/pdf/poster'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -77,6 +105,7 @@ export interface RootRouteChildren {
   ZipRoute: typeof ZipRoute
   ExportXlsRoute: typeof ExportXlsRoute
   ImgCompressorRoute: typeof ImgCompressorRoute
+  PdfPosterRoute: typeof PdfPosterRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -116,6 +145,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ImgCompressorRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/pdf/poster': {
+      id: '/pdf/poster'
+      path: '/pdf/poster'
+      fullPath: '/pdf/poster'
+      preLoaderRoute: typeof PdfPosterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -125,6 +161,7 @@ const rootRouteChildren: RootRouteChildren = {
   ZipRoute: ZipRoute,
   ExportXlsRoute: ExportXlsRoute,
   ImgCompressorRoute: ImgCompressorRoute,
+  PdfPosterRoute: PdfPosterRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

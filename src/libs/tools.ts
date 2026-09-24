@@ -4,6 +4,7 @@ import {
   FolderZipRegular,
   ImageRegular,
   QrCodeRegular,
+  PrintRegular,
 } from '@fluentui/react-icons'
 import type { FileRouteTypes } from '#/routeTree.gen'
 
@@ -44,6 +45,17 @@ export const TOOL_GROUPS: ToolGroup[] = [
         title: '圖片壓縮',
         description: '縮小照片檔案大小，方便夾帶在信件或上傳系統',
         icon: ImageRegular,
+      },
+    ],
+  },
+  {
+    title: 'PDF 工具',
+    tools: [
+      {
+        to: '/pdf/poster',
+        title: '海報分割列印',
+        description: '將 PDF 放大分割成多張 A4 或 A3，列印後拼成海報',
+        icon: PrintRegular,
       },
     ],
   },
