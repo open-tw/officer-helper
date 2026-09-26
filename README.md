@@ -11,6 +11,7 @@
 | QR Code 產生器 | `/qr-code`        | 輸入網址或文字產生 QR Code，可選容錯率，下載成 PNG    |
 | 壓一起         | `/zip`            | 選取或拖曳多個檔案，打包成單一 `.zip` 下載            |
 | 圖片壓縮       | `/img/compressor` | 批次縮小圖片檔案大小，可單張下載或打包成 `.zip`       |
+| 圖片浮水印     | `/img/watermark`  | 加入文字浮水印，可選大小、透明度與角度，即時預覽並下載 |
 | XLS 轉換       | `/export/xls`     | 把舊版 Excel 的 `.xls` 轉成 `.xlsx`、`.ods` 或 `.csv` |
 | 海報分割列印   | `/pdf/poster`     | 將 PDF 放大成 2／4／8 張 A4 或 A3，列印後拼貼         |
 
@@ -63,6 +64,7 @@ src/
 │   ├── qr-code.tsx
 │   ├── zip.tsx
 │   ├── img/compressor.tsx
+│   ├── img/watermark.tsx
 │   ├── pdf/poster.tsx
 │   └── export/xls.tsx
 ├── components/              # 跨頁共用元件（PageIntro、ColorPickerPopup）
