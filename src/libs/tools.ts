@@ -5,6 +5,7 @@ import {
   ImageRegular,
   QrCodeRegular,
   PrintRegular,
+  ShieldCheckmarkRegular,
 } from '@fluentui/react-icons'
 import type { FileRouteTypes } from '#/routeTree.gen'
 
@@ -45,6 +46,12 @@ export const TOOL_GROUPS: ToolGroup[] = [
         title: '圖片壓縮',
         description: '縮小照片檔案大小，方便夾帶在信件或上傳系統',
         icon: ImageRegular,
+      },
+      {
+        to: '/img/watermark',
+        title: '圖片浮水印',
+        description: '在圖片上加入文字浮水印，標示來源或用途',
+        icon: ShieldCheckmarkRegular,
       },
     ],
   },
