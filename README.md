@@ -138,3 +138,7 @@ location /officer-helper/ {
   try_files $uri $uri/ /officer-helper/index.html;
 }
 ```
+
+## License
+
+本專案採用 [MIT License](LICENSE) 授權。
