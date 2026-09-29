@@ -6,15 +6,16 @@
 
 ## 工具一覽
 
-| 工具           | 路徑              | 說明                                                   |
-| -------------- | ----------------- | ------------------------------------------------------ |
-| QR Code 產生器 | `/qr-code`        | 輸入網址或文字產生 QR Code，可選容錯率，下載成 PNG     |
-| 壓一起         | `/zip`            | 選取或拖曳多個檔案，打包成單一 `.zip` 下載             |
-| 圖片壓縮       | `/img/compressor` | 批次縮小圖片檔案大小，可單張下載或打包成 `.zip`        |
-| 圖片浮水印     | `/img/watermark`  | 加入文字浮水印，可選大小、透明度與角度，即時預覽並下載 |
-| XLS 轉換       | `/export/xls`     | 把舊版 Excel 的 `.xls` 轉成 `.xlsx`、`.ods` 或 `.csv`  |
-| 海報分割列印   | `/pdf/poster`     | 將 PDF 放大成 2／4／8 張 A4 或 A3，列印後拼貼          |
-| PDF 合併       | `/pdf/merge`      | 整份合併，或預覽並選擇指定頁面、調整順序後下載         |
+| 工具           | 路徑               | 說明                                                   |
+| -------------- | ------------------ | ------------------------------------------------------ |
+| QR Code 產生器 | `/qr-code`         | 輸入網址或文字產生 QR Code，可選容錯率，下載成 PNG     |
+| 壓一起         | `/zip`             | 選取或拖曳多個檔案，打包成單一 `.zip` 下載             |
+| 圖片壓縮       | `/img/compressor`  | 批次縮小圖片檔案大小，可單張下載或打包成 `.zip`        |
+| 圖片浮水印     | `/img/watermark`   | 加入文字浮水印，可選大小、透明度與角度，即時預覽並下載 |
+| 照片佐證表     | `/img/photo-sheet` | 照片排序與簡短說明，匯出兩欄 A4 的 PDF／ODT／DOCX      |
+| XLS 轉換       | `/export/xls`      | 把舊版 Excel 的 `.xls` 轉成 `.xlsx`、`.ods` 或 `.csv`  |
+| 海報分割列印   | `/pdf/poster`      | 將 PDF 放大成 2／4／8 張 A4 或 A3，列印後拼貼          |
+| PDF 合併       | `/pdf/merge`       | 整份合併，或預覽並選擇指定頁面、調整順序後下載         |
 
 ## 開發
 
@@ -27,16 +28,17 @@ npm run dev      # http://localhost:3000
 
 ## 可用指令
 
-| 指令                      | 用途                              |
-| ------------------------- | --------------------------------- |
-| `npm run dev`             | 啟動開發伺服器（port 3000）       |
-| `npm run build`           | 建置到 `dist/`                    |
-| `npm run preview`         | 在本機預覽建置結果                |
-| `npm run lint`            | ESLint 檢查                       |
-| `npm run test:poster`     | 海報排版、PDF 輸出及渲染比對測試  |
-| `npm run format`          | Prettier 格式化並自動修正 ESLint  |
-| `npm run check`           | 只檢查格式，不修改檔案（適合 CI） |
-| `npm run generate-routes` | 手動重新產生路由檔                |
+| 指令                       | 用途                                        |
+| -------------------------- | ------------------------------------------- |
+| `npm run dev`              | 啟動開發伺服器（port 3000）                 |
+| `npm run build`            | 建置到 `dist/`                              |
+| `npm run preview`          | 在本機預覽建置結果                          |
+| `npm run lint`             | ESLint 檢查                                 |
+| `npm run test:photo-sheet` | 照片排版、PDF 渲染比對與 ODT／DOCX 結構測試 |
+| `npm run test:poster`      | 海報排版、PDF 輸出及渲染比對測試            |
+| `npm run format`           | Prettier 格式化並自動修正 ESLint            |
+| `npm run check`            | 只檢查格式，不修改檔案（適合 CI）           |
+| `npm run generate-routes`  | 手動重新產生路由檔                          |
 
 > `npm run build` **不會**做 TypeScript 型別檢查（Vite 只轉譯不檢查）。型別要另外跑 `npx tsc --noEmit`。
 
@@ -55,6 +57,8 @@ node --experimental-strip-types --test tests/pdf-merge.test.ts
 - **[zip.js](https://github.com/gildas-lormeau/zip.js)** — 瀏覽器端壓縮
 - **[browser-image-compression](https://github.com/Donaldcwl/browser-image-compression)** — 圖片壓縮
 - **[pdf-lib](https://pdf-lib.js.org/)** — PDF 合併、頁面擷取與海報分割輸出
+- **[docx](https://docx.js.org/)** — 瀏覽器端產生可編輯的 DOCX 照片表格
+- **[odf-kit](https://github.com/GitHubNewbie0/odf-kit)** — 瀏覽器端產生 ODT 照片表格
 - **[PDF.js](https://mozilla.github.io/pdf.js/)** — PDF 預覽；渲染測試使用其可選依賴 `@napi-rs/canvas`，安裝時請保留 optional dependencies
 
 > `xlsx` 這個套件是從 SheetJS 官方 CDN 安裝（不是 npm registry），這是官方建議的做法。若建置環境無法連外或使用內部 registry，需要先處理這個依賴。
@@ -72,11 +76,13 @@ src/
 │   ├── zip.tsx
 │   ├── img/compressor.tsx
 │   ├── img/watermark.tsx
+│   ├── img/photo-sheet.tsx
 │   ├── pdf/poster.tsx
 │   ├── pdf/merge.tsx
 │   └── export/xls.tsx
 ├── components/              # 跨頁共用元件（PageIntro、ColorPickerPopup）
 ├── libs/
+│   ├── photo-sheet/         # 表單資料、共用排版與可擴充的匯出介面
 │   ├── tools.ts             # 工具清單的單一來源，首頁讀這裡
 │   ├── pdf-merge.ts         # PDF 讀取、指定頁面合併與輸出
 │   └── seo.ts               # 產生頁面 meta 標籤

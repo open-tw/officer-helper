@@ -14,6 +14,7 @@ import { Route as QrCodeRouteImport } from './routes/qr-code'
 import { Route as ZipRouteImport } from './routes/zip'
 import { Route as ExportXlsRouteImport } from './routes/export/xls'
 import { Route as ImgCompressorRouteImport } from './routes/img/compressor'
+import { Route as ImgPhotoSheetRouteImport } from './routes/img/photo-sheet'
 import { Route as ImgWatermarkRouteImport } from './routes/img/watermark'
 import { Route as PdfMergeRouteImport } from './routes/pdf/merge'
 import { Route as PdfPosterRouteImport } from './routes/pdf/poster'
@@ -43,6 +44,11 @@ const ImgCompressorRoute = ImgCompressorRouteImport.update({
   path: '/img/compressor',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ImgPhotoSheetRoute = ImgPhotoSheetRouteImport.update({
+  id: '/img/photo-sheet',
+  path: '/img/photo-sheet',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ImgWatermarkRoute = ImgWatermarkRouteImport.update({
   id: '/img/watermark',
   path: '/img/watermark',
@@ -65,6 +71,7 @@ export interface FileRoutesByFullPath {
   '/zip': typeof ZipRoute
   '/export/xls': typeof ExportXlsRoute
   '/img/compressor': typeof ImgCompressorRoute
+  '/img/photo-sheet': typeof ImgPhotoSheetRoute
   '/img/watermark': typeof ImgWatermarkRoute
   '/pdf/merge': typeof PdfMergeRoute
   '/pdf/poster': typeof PdfPosterRoute
@@ -75,6 +82,7 @@ export interface FileRoutesByTo {
   '/zip': typeof ZipRoute
   '/export/xls': typeof ExportXlsRoute
   '/img/compressor': typeof ImgCompressorRoute
+  '/img/photo-sheet': typeof ImgPhotoSheetRoute
   '/img/watermark': typeof ImgWatermarkRoute
   '/pdf/merge': typeof PdfMergeRoute
   '/pdf/poster': typeof PdfPosterRoute
@@ -86,6 +94,7 @@ export interface FileRoutesById {
   '/zip': typeof ZipRoute
   '/export/xls': typeof ExportXlsRoute
   '/img/compressor': typeof ImgCompressorRoute
+  '/img/photo-sheet': typeof ImgPhotoSheetRoute
   '/img/watermark': typeof ImgWatermarkRoute
   '/pdf/merge': typeof PdfMergeRoute
   '/pdf/poster': typeof PdfPosterRoute
@@ -98,6 +107,7 @@ export interface FileRouteTypes {
     | '/zip'
     | '/export/xls'
     | '/img/compressor'
+    | '/img/photo-sheet'
     | '/img/watermark'
     | '/pdf/merge'
     | '/pdf/poster'
@@ -108,6 +118,7 @@ export interface FileRouteTypes {
     | '/zip'
     | '/export/xls'
     | '/img/compressor'
+    | '/img/photo-sheet'
     | '/img/watermark'
     | '/pdf/merge'
     | '/pdf/poster'
@@ -118,6 +129,7 @@ export interface FileRouteTypes {
     | '/zip'
     | '/export/xls'
     | '/img/compressor'
+    | '/img/photo-sheet'
     | '/img/watermark'
     | '/pdf/merge'
     | '/pdf/poster'
@@ -129,6 +141,7 @@ export interface RootRouteChildren {
   ZipRoute: typeof ZipRoute
   ExportXlsRoute: typeof ExportXlsRoute
   ImgCompressorRoute: typeof ImgCompressorRoute
+  ImgPhotoSheetRoute: typeof ImgPhotoSheetRoute
   ImgWatermarkRoute: typeof ImgWatermarkRoute
   PdfMergeRoute: typeof PdfMergeRoute
   PdfPosterRoute: typeof PdfPosterRoute
@@ -171,6 +184,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ImgCompressorRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/img/photo-sheet': {
+      id: '/img/photo-sheet'
+      path: '/img/photo-sheet'
+      fullPath: '/img/photo-sheet'
+      preLoaderRoute: typeof ImgPhotoSheetRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/img/watermark': {
       id: '/img/watermark'
       path: '/img/watermark'
@@ -201,6 +221,7 @@ const rootRouteChildren: RootRouteChildren = {
   ZipRoute: ZipRoute,
   ExportXlsRoute: ExportXlsRoute,
   ImgCompressorRoute: ImgCompressorRoute,
+  ImgPhotoSheetRoute: ImgPhotoSheetRoute,
   ImgWatermarkRoute: ImgWatermarkRoute,
   PdfMergeRoute: PdfMergeRoute,
   PdfPosterRoute: PdfPosterRoute,

@@ -42,18 +42,6 @@ export const TOOL_GROUPS: ToolGroup[] = [
         description: '把多個檔案打包成一個 .zip，方便寄送或上傳',
         icon: FolderZipRegular,
       },
-      {
-        to: '/img/compressor',
-        title: '圖片壓縮',
-        description: '縮小照片檔案大小，方便夾帶在信件或上傳系統',
-        icon: ImageRegular,
-      },
-      {
-        to: '/img/watermark',
-        title: '圖片浮水印',
-        description: '在圖片上加入文字浮水印，標示來源或用途',
-        icon: ShieldCheckmarkRegular,
-      },
     ],
   },
   {
@@ -81,6 +69,29 @@ export const TOOL_GROUPS: ToolGroup[] = [
         title: 'XLS 轉換',
         description: '把舊版 Excel 的 .xls 轉成 .xlsx、.ods 或 .csv',
         icon: ArrowSyncRegular,
+      },
+    ],
+  },
+  {
+    title: '圖片工具',
+    tools: [
+      {
+        to: '/img/compressor',
+        title: '圖片壓縮',
+        description: '縮小照片檔案大小，方便夾帶在信件或上傳系統',
+        icon: ImageRegular,
+      },
+      {
+        to: '/img/photo-sheet',
+        title: '照片佐證表',
+        description: '照片自動排成兩欄表格，下載 PDF、ODT和DOCX',
+        icon: ImageRegular,
+      },
+      {
+        to: '/img/watermark',
+        title: '圖片浮水印',
+        description: '在圖片上加入文字浮水印，標示來源或用途',
+        icon: ShieldCheckmarkRegular,
       },
     ],
   },
