@@ -15,6 +15,7 @@ import { Route as ZipRouteImport } from './routes/zip'
 import { Route as ExportXlsRouteImport } from './routes/export/xls'
 import { Route as ImgCompressorRouteImport } from './routes/img/compressor'
 import { Route as ImgWatermarkRouteImport } from './routes/img/watermark'
+import { Route as PdfMergeRouteImport } from './routes/pdf/merge'
 import { Route as PdfPosterRouteImport } from './routes/pdf/poster'
 
 const IndexRoute = IndexRouteImport.update({
@@ -47,6 +48,11 @@ const ImgWatermarkRoute = ImgWatermarkRouteImport.update({
   path: '/img/watermark',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PdfMergeRoute = PdfMergeRouteImport.update({
+  id: '/pdf/merge',
+  path: '/pdf/merge',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PdfPosterRoute = PdfPosterRouteImport.update({
   id: '/pdf/poster',
   path: '/pdf/poster',
@@ -60,6 +66,7 @@ export interface FileRoutesByFullPath {
   '/export/xls': typeof ExportXlsRoute
   '/img/compressor': typeof ImgCompressorRoute
   '/img/watermark': typeof ImgWatermarkRoute
+  '/pdf/merge': typeof PdfMergeRoute
   '/pdf/poster': typeof PdfPosterRoute
 }
 export interface FileRoutesByTo {
@@ -69,6 +76,7 @@ export interface FileRoutesByTo {
   '/export/xls': typeof ExportXlsRoute
   '/img/compressor': typeof ImgCompressorRoute
   '/img/watermark': typeof ImgWatermarkRoute
+  '/pdf/merge': typeof PdfMergeRoute
   '/pdf/poster': typeof PdfPosterRoute
 }
 export interface FileRoutesById {
@@ -79,6 +87,7 @@ export interface FileRoutesById {
   '/export/xls': typeof ExportXlsRoute
   '/img/compressor': typeof ImgCompressorRoute
   '/img/watermark': typeof ImgWatermarkRoute
+  '/pdf/merge': typeof PdfMergeRoute
   '/pdf/poster': typeof PdfPosterRoute
 }
 export interface FileRouteTypes {
@@ -90,6 +99,7 @@ export interface FileRouteTypes {
     | '/export/xls'
     | '/img/compressor'
     | '/img/watermark'
+    | '/pdf/merge'
     | '/pdf/poster'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -99,6 +109,7 @@ export interface FileRouteTypes {
     | '/export/xls'
     | '/img/compressor'
     | '/img/watermark'
+    | '/pdf/merge'
     | '/pdf/poster'
   id:
     | '__root__'
@@ -108,6 +119,7 @@ export interface FileRouteTypes {
     | '/export/xls'
     | '/img/compressor'
     | '/img/watermark'
+    | '/pdf/merge'
     | '/pdf/poster'
   fileRoutesById: FileRoutesById
 }
@@ -118,6 +130,7 @@ export interface RootRouteChildren {
   ExportXlsRoute: typeof ExportXlsRoute
   ImgCompressorRoute: typeof ImgCompressorRoute
   ImgWatermarkRoute: typeof ImgWatermarkRoute
+  PdfMergeRoute: typeof PdfMergeRoute
   PdfPosterRoute: typeof PdfPosterRoute
 }
 
@@ -165,6 +178,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ImgWatermarkRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/pdf/merge': {
+      id: '/pdf/merge'
+      path: '/pdf/merge'
+      fullPath: '/pdf/merge'
+      preLoaderRoute: typeof PdfMergeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/pdf/poster': {
       id: '/pdf/poster'
       path: '/pdf/poster'
@@ -182,6 +202,7 @@ const rootRouteChildren: RootRouteChildren = {
   ExportXlsRoute: ExportXlsRoute,
   ImgCompressorRoute: ImgCompressorRoute,
   ImgWatermarkRoute: ImgWatermarkRoute,
+  PdfMergeRoute: PdfMergeRoute,
   PdfPosterRoute: PdfPosterRoute,
 }
 export const routeTree = rootRouteImport

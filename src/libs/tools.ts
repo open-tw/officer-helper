@@ -1,6 +1,7 @@
 import type { FluentIcon } from '@fluentui/react-icons'
 import {
   ArrowSyncRegular,
+  DocumentPdfRegular,
   FolderZipRegular,
   ImageRegular,
   QrCodeRegular,
@@ -58,6 +59,12 @@ export const TOOL_GROUPS: ToolGroup[] = [
   {
     title: 'PDF 工具',
     tools: [
+      {
+        to: '/pdf/merge',
+        title: 'PDF 合併',
+        description: '整份合併 PDF，或選擇指定頁面、調整順序後下載',
+        icon: DocumentPdfRegular,
+      },
       {
         to: '/pdf/poster',
         title: '海報分割列印',
