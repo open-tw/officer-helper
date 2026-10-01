@@ -1,11 +1,15 @@
 import { ColorPickerPopup } from '#/components/color-picker-popup'
 import { PageIntro } from '#/components/page-intro'
+import { buildWifiPayload } from '#/libs/qr-wifi'
+import type { WifiSecurity } from '#/libs/qr-wifi'
 import { seo } from '#/libs/seo'
 import {
   Button,
   Caption1,
   Card,
+  Checkbox,
   Field,
+  Input,
   Label,
   Radio,
   RadioGroup,
@@ -34,7 +38,7 @@ export const Route = createFileRoute('/qr-code')({
       ...seo({
         title: 'QR Code 產生器',
         description:
-          '輸入網址或文字產生 QR Code，可下載 PNG、SVG 或直接複製貼上。',
+          '輸入網址、文字或 Wi-Fi 連線資訊產生 QR Code，可下載 PNG、SVG 或直接複製貼上。',
       }),
     ],
   }),
@@ -242,6 +246,12 @@ function RouteComponent() {
   const { dispatchToast } = useToastController(toasterId)
   const previewRef = useRef<HTMLDivElement>(null)
 
+  const [mode, setMode] = useState<'text' | 'wifi'>('text')
+  const [ssid, setSsid] = useState('')
+  const [password, setPassword] = useState('')
+  const [security, setSecurity] = useState<WifiSecurity>('WPA')
+  const [hidden, setHidden] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
   const [value, setValue] = useState('')
   const [level, setLevel] = useState<Level>('M')
   const [size, setSize] = useState<Size>(1024)
@@ -249,13 +259,18 @@ function RouteComponent() {
   const [bgColor, setBgColor] = useState('#ffffff')
 
   // 打字時先更新輸入框，QR Code 稍後跟上，長文字也不會卡
-  const deferredValue = useDeferredValue(value)
+  const ssidTooLong = byteLength(ssid) > 32
+  const payload =
+    mode === 'wifi'
+      ? buildWifiPayload({ ssid, password, security, hidden })
+      : value.trim()
+  const deferredValue = useDeferredValue(payload)
 
-  const trimmed = deferredValue.trim()
+  const trimmed = deferredValue
   const bytes = byteLength(trimmed)
   const capacity = LEVELS.find((l) => l.value === level)!.capacity
   const tooLong = bytes > capacity
-  const canRender = trimmed.length > 0 && !tooLong
+  const canRender = trimmed.length > 0 && !tooLong && payload === deferredValue
 
   const contrast = contrastRatio(fgColor, bgColor)
   const inverted = luminance(fgColor) > luminance(bgColor)
@@ -319,34 +334,112 @@ function RouteComponent() {
 
       <PageIntro
         title="QR Code 產生器"
-        description="輸入網址或文字，右側會即時產生 QR Code。"
+        description="輸入網址、文字或 Wi-Fi 連線資訊，即時產生 QR Code。"
       />
 
       <div className={styles.layout}>
         <div className={styles.form}>
-          <Field
-            label="內容"
-            required
-            validationState={tooLong ? 'error' : 'none'}
-            validationMessage={
-              tooLong
-                ? `內容太長：目前 ${bytes} bytes，此容錯率上限 ${capacity} bytes。請縮短內容或降低容錯率。`
-                : undefined
-            }
-            hint={
-              tooLong
-                ? undefined
-                : `網址、文字、電話都可以。中文字每字約佔 3 bytes（${bytes} / ${capacity}）`
-            }
-          >
-            <Textarea
-              value={value}
-              onChange={(_, d) => setValue(d.value)}
-              placeholder="例如：https://www.example.gov.tw/"
-              resize="vertical"
-              rows={3}
-            />
+          <Field label="類型">
+            <RadioGroup
+              layout="horizontal"
+              value={mode}
+              onChange={(_, data) => setMode(data.value as 'text' | 'wifi')}
+            >
+              <Radio value="text" label="網址／文字" />
+              <Radio value="wifi" label="Wi-Fi" />
+            </RadioGroup>
           </Field>
+
+          {mode === 'wifi' ? (
+            <>
+              <Field
+                label="網路名稱（SSID）"
+                required
+                validationState={ssidTooLong ? 'error' : 'none'}
+                validationMessage={
+                  ssidTooLong ? '網路名稱不可超過 32 bytes。' : undefined
+                }
+                hint="請與 Wi-Fi 名稱完全一致，包含大小寫與空白。"
+              >
+                <Input
+                  value={ssid}
+                  onChange={(_, data) => setSsid(data.value)}
+                  placeholder="例如：Office Wi-Fi"
+                />
+              </Field>
+              <Field label="加密方式">
+                <Select
+                  value={security}
+                  onChange={(_, data) =>
+                    setSecurity(data.value as WifiSecurity)
+                  }
+                >
+                  <option value="WPA">WPA／WPA2（個人網路）</option>
+                  <option value="WEP">WEP</option>
+                  <option value="nopass">無密碼（開放網路）</option>
+                </Select>
+              </Field>
+              {security !== 'nopass' && (
+                <>
+                  <Field label="Wi-Fi 密碼" required>
+                    <Input
+                      type={showPassword ? 'text' : 'password'}
+                      value={password}
+                      onChange={(_, data) => setPassword(data.value)}
+                      autoComplete="off"
+                    />
+                  </Field>
+                  <Checkbox
+                    label="顯示密碼"
+                    checked={showPassword}
+                    onChange={(_, data) =>
+                      setShowPassword(data.checked === true)
+                    }
+                  />
+                </>
+              )}
+              <Checkbox
+                label="隱藏的網路"
+                checked={hidden}
+                onChange={(_, data) => setHidden(data.checked === true)}
+              />
+              <Caption1>
+                使用手機相機掃描即可開啟 Wi-Fi
+                連線提示，實際支援依裝置而定。資料只在瀏覽器中處理；QR Code
+                包含連線資訊，請分享給允許使用網路的人。
+              </Caption1>
+              {tooLong && (
+                <Caption1>
+                  內容太長，請縮短資訊或降低容錯率（{bytes} / {capacity}{' '}
+                  bytes）。
+                </Caption1>
+              )}
+            </>
+          ) : (
+            <Field
+              label="內容"
+              required
+              validationState={tooLong ? 'error' : 'none'}
+              validationMessage={
+                tooLong
+                  ? `內容太長：目前 ${bytes} bytes，此容錯率上限 ${capacity} bytes。請縮短內容或降低容錯率。`
+                  : undefined
+              }
+              hint={
+                tooLong
+                  ? undefined
+                  : `網址、文字、電話都可以。中文字每字約佔 3 bytes（${bytes} / ${capacity}）`
+              }
+            >
+              <Textarea
+                value={value}
+                onChange={(_, d) => setValue(d.value)}
+                placeholder="例如：https://www.example.gov.tw/"
+                resize="vertical"
+                rows={3}
+              />
+            </Field>
+          )}
 
           <Field
             label="容錯率"
@@ -427,13 +520,19 @@ function RouteComponent() {
                 bgColor={bgColor}
                 size={256}
                 className={styles.qr}
-                title={`QR Code：${trimmed}`}
+                title={
+                  mode === 'wifi' ? 'Wi-Fi 連線 QR Code' : `QR Code：${trimmed}`
+                }
               />
             ) : (
               <div className={styles.empty}>
                 <QrCodeRegular className={styles.emptyIcon} aria-hidden />
                 <Caption1>
-                  {tooLong ? '內容太長，無法產生' : '輸入內容後會在這裡顯示'}
+                  {tooLong
+                    ? '內容太長，無法產生'
+                    : mode === 'wifi'
+                      ? '請填寫有效的網路名稱與密碼'
+                      : '輸入內容後會在這裡顯示'}
                 </Caption1>
               </div>
             )}

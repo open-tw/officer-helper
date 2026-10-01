@@ -33,7 +33,7 @@ export const TOOL_GROUPS: ToolGroup[] = [
       {
         to: '/qr-code',
         title: 'QR Code 產生器',
-        description: '輸入網址或文字，產生可下載的 QR Code 圖片',
+        description: '輸入網址、文字或 Wi-Fi 資訊，產生可下載的 QR Code 圖片',
         icon: QrCodeRegular,
       },
       {
