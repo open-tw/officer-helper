@@ -34,6 +34,13 @@ export const browserDrawing: DrawingRuntime = {
 const FONT =
   '"Noto Sans TC", "PingFang TC", "Microsoft JhengHei", "Heiti TC", sans-serif'
 
+/** Canvas/document exports preserve JPEG and PNG; other inputs use lossless PNG. */
+export function photoOutputType(image: Blob, name = '') {
+  return image.type === 'image/jpeg' || (!image.type && /\.jpe?g$/i.test(name))
+    ? 'image/jpeg'
+    : 'image/png'
+}
+
 export function canvasBlob(
   canvas: HTMLCanvasElement,
   type = 'image/jpeg',
@@ -52,7 +59,10 @@ export function canvasBlob(
 }
 
 /** Normalize orientation and bound memory while retaining print resolution. */
-export async function preparePhoto(file: File): Promise<PhotoSheetPhoto> {
+export async function preparePhoto(
+  file: File,
+  runtime: DrawingRuntime = browserDrawing,
+): Promise<PhotoSheetPhoto> {
   if (/\.hei[cf]$/i.test(file.name) || /hei[cf]/i.test(file.type))
     throw new Error('請先將 HEIC／HEIF 轉為 JPG 或 PNG。')
   if (
@@ -60,21 +70,24 @@ export async function preparePhoto(file: File): Promise<PhotoSheetPhoto> {
     !/^image\/(jpeg|png|webp|bmp)$/.test(file.type)
   )
     throw new Error('支援 JPG、PNG、WebP 與 BMP 圖片。')
-  const decoded = await browserDrawing.decode(file)
-  const canvas = browserDrawing.canvas()
+  const decoded = await runtime.decode(file)
+  const canvas = runtime.canvas()
+  const type = photoOutputType(file, file.name)
   try {
     const ratio = Math.min(1, 2400 / Math.max(decoded.width, decoded.height))
     canvas.width = Math.max(1, Math.round(decoded.width * ratio))
     canvas.height = Math.max(1, Math.round(decoded.height * ratio))
     const ctx = canvas.getContext('2d')
     if (!ctx) throw new Error('瀏覽器無法處理圖片。')
-    ctx.fillStyle = '#fff'
-    ctx.fillRect(0, 0, canvas.width, canvas.height)
+    if (type === 'image/jpeg') {
+      ctx.fillStyle = '#fff'
+      ctx.fillRect(0, 0, canvas.width, canvas.height)
+    }
     ctx.drawImage(decoded.image, 0, 0, canvas.width, canvas.height)
     return {
       id: crypto.randomUUID(),
       name: file.name,
-      image: await canvasBlob(canvas),
+      image: await canvasBlob(canvas, type),
       caption: '',
       rotation: 0,
       fit: 'contain',

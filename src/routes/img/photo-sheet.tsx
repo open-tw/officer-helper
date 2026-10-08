@@ -493,7 +493,8 @@ function RouteComponent() {
               加入照片
             </Button>
             <p className={styles.muted}>
-              可多選或拖曳加入 JPG、PNG、WebP、BMP。
+              可多選或拖曳加入 JPG、PNG、WebP、BMP。DOCX／ODT 保留 JPG、PNG
+              格式，WebP、BMP 轉為 PNG。
             </p>
           </div>
           <div className={styles.row}>

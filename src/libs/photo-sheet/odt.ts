@@ -125,7 +125,7 @@ export async function exportPhotoSheetOdt(
           p.addText(`日期：${sheet.date}`, { fontFamily: FONT, fontSize: 10 }),
         { spaceAfter: '0.2cm' },
       )
-    const images: Uint8Array[] = []
+    const images: Awaited<ReturnType<typeof documentPhotoBytes>>[] = []
     for (const photo of photos)
       images.push(
         await documentPhotoBytes(photo, height, runtime, options.signal),
@@ -140,10 +140,10 @@ export async function exportPhotoSheetOdt(
               row.addCell(
                 (cell) => {
                   if (!photo) return
-                  cell.addImage(images[index], {
+                  cell.addImage(images[index].bytes, {
                     width: `${DOCUMENT_IMAGE_WIDTH}cm`,
                     height: `${height}cm`,
-                    mimeType: 'image/jpeg',
+                    mimeType: images[index].mimeType,
                     anchor: 'as-character',
                     alt: photo.caption || photo.name,
                   })

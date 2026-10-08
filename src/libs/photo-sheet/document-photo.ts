@@ -1,5 +1,5 @@
 import { imagePlacement } from './model.ts'
-import { canvasBlob } from './render.ts'
+import { canvasBlob, photoOutputType } from './render.ts'
 import type { PhotoSheetPhoto, PhotoSheet } from './model.ts'
 import type { DrawingRuntime } from './render.ts'
 
@@ -18,14 +18,17 @@ export async function documentPhotoBytes(
   signal?.throwIfAborted()
   const decoded = await runtime.decode(photo.image)
   const canvas = runtime.canvas()
+  const mimeType = photoOutputType(photo.image, photo.name)
   try {
     signal?.throwIfAborted()
     canvas.width = Math.round(DOCUMENT_IMAGE_WIDTH * 100)
     canvas.height = Math.round(height * 100)
     const ctx = canvas.getContext('2d')
     if (!ctx) throw new Error('瀏覽器無法處理照片。')
-    ctx.fillStyle = '#fff'
-    ctx.fillRect(0, 0, canvas.width, canvas.height)
+    if (mimeType === 'image/jpeg') {
+      ctx.fillStyle = '#fff'
+      ctx.fillRect(0, 0, canvas.width, canvas.height)
+    }
     const size = imagePlacement(
       decoded.width,
       decoded.height,
@@ -43,9 +46,13 @@ export async function documentPhotoBytes(
       size.width,
       size.height,
     )
-    const blob = await canvasBlob(canvas)
+    const blob = await canvasBlob(canvas, mimeType)
     signal?.throwIfAborted()
-    return new Uint8Array(await blob.arrayBuffer())
+    return {
+      bytes: new Uint8Array(await blob.arrayBuffer()),
+      mimeType,
+      type: mimeType === 'image/jpeg' ? ('jpg' as const) : ('png' as const),
+    }
   } finally {
     decoded.close()
     canvas.width = canvas.height = 0

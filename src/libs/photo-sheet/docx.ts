@@ -76,7 +76,7 @@ export async function exportPhotoSheetDocx(
       )
     const cells: TableCell[] = []
     for (const [index, photo] of photos.entries()) {
-      const bytes = await documentPhotoBytes(
+      const image = await documentPhotoBytes(
         photo,
         height,
         runtime,
@@ -99,8 +99,8 @@ export async function exportPhotoSheetDocx(
               spacing: { before: 0, after: 60 },
               children: [
                 new ImageRun({
-                  type: 'jpg',
-                  data: bytes,
+                  type: image.type,
+                  data: image.bytes,
                   transformation: {
                     width: cmToPixel(DOCUMENT_IMAGE_WIDTH),
                     height: cmToPixel(height),

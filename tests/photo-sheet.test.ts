@@ -14,11 +14,104 @@ import {
   wrapText,
 } from '../src/libs/photo-sheet/model.ts'
 import type { PhotoSheet } from '../src/libs/photo-sheet/model.ts'
-import { renderPhotoSheetPage } from '../src/libs/photo-sheet/render.ts'
+import {
+  preparePhoto,
+  renderPhotoSheetPage,
+} from '../src/libs/photo-sheet/render.ts'
 import type { DrawingRuntime } from '../src/libs/photo-sheet/render.ts'
 import { exportPhotoSheetOdt } from '../src/libs/photo-sheet/odt.ts'
-import { BlobReader, TextWriter, ZipReader } from '@zip.js/zip.js'
+import { BlobReader, BlobWriter, TextWriter, ZipReader } from '@zip.js/zip.js'
 import { exportPhotoSheetPdf } from '../src/libs/photo-sheet/export.ts'
+import { exportPhotoSheetDocx } from '../src/libs/photo-sheet/docx.ts'
+import { documentPhotoBytes } from '../src/libs/photo-sheet/document-photo.ts'
+
+test('import and document rendering preserve PNG transparency and JPEG encoding, converting WebP to PNG', async () => {
+  const canvas = createCanvas(20, 20)
+  canvas.getContext('2d').fillRect(5, 5, 10, 10)
+  for (const type of ['image/png', 'image/jpeg', 'image/webp'] as const) {
+    const file = new File(
+      [
+        new Uint8Array(
+          type === 'image/png'
+            ? canvas.toBuffer('image/png')
+            : canvas.toBuffer(type),
+        ),
+      ],
+      `photo.${type.split('/')[1]}`,
+      { type },
+    )
+    const photo = await preparePhoto(file, runtime)
+    const expected = type === 'image/jpeg' ? 'image/jpeg' : 'image/png'
+    assert.equal(photo.image.type, expected)
+    const result = await documentPhotoBytes(photo, 3.3, runtime)
+    assert.equal(result.mimeType, expected)
+    assert.equal(result.type, expected === 'image/jpeg' ? 'jpg' : 'png')
+    if (expected === 'image/png') {
+      for (const blob of [photo.image, new Blob([result.bytes])]) {
+        const decoded = await loadImage(Buffer.from(await blob.arrayBuffer()))
+        const check = createCanvas(decoded.width, decoded.height)
+        check.getContext('2d').drawImage(decoded, 0, 0)
+        assert.equal(check.getContext('2d').getImageData(0, 0, 1, 1).data[3], 0)
+      }
+    } else {
+      assert.deepEqual(Array.from(result.bytes.slice(0, 3)), [255, 216, 255])
+    }
+  }
+})
+
+test('DOCX and ODT embed mixed PNG/JPEG with matching bytes, extensions and declarations', async () => {
+  const sheet = fixture(2)
+  const canvas = createCanvas(20, 20)
+  sheet.photos[1] = await preparePhoto(
+    new File([new Uint8Array(canvas.toBuffer('image/jpeg'))], 'photo.jpg', {
+      type: 'image/jpeg',
+    }),
+    runtime,
+  )
+  for (const format of ['docx', 'odt'] as const) {
+    const blob = await (
+      format === 'docx' ? exportPhotoSheetDocx : exportPhotoSheetOdt
+    )(sheet, {}, runtime)
+    const reader = new ZipReader(new BlobReader(blob))
+    try {
+      const entries = await reader.getEntries()
+      const media = entries.filter(
+        (entry) =>
+          !entry.directory &&
+          entry.filename.startsWith(
+            format === 'docx' ? 'word/media/' : 'Pictures/',
+          ),
+      )
+      assert.equal(media.length, 2)
+      for (const extension of ['png', 'jpg']) {
+        const entry = media.find(
+          (item) =>
+            item.filename.endsWith(`.${extension}`) ||
+            (extension === 'jpg' && item.filename.endsWith('.jpeg')),
+        )
+        assert.ok(entry && !entry.directory)
+        const bytes = new Uint8Array(
+          await (await entry.getData(new BlobWriter())).arrayBuffer(),
+        )
+        assert.deepEqual(
+          Array.from(bytes.slice(0, 3)),
+          extension === 'png' ? [137, 80, 78] : [255, 216, 255],
+        )
+      }
+      const declaration = entries.find(
+        (entry) =>
+          entry.filename ===
+          (format === 'docx' ? '[Content_Types].xml' : 'META-INF/manifest.xml'),
+      )
+      assert.ok(declaration && !declaration.directory)
+      const xml = await declaration.getData(new TextWriter())
+      assert.match(xml, /image\/png/)
+      assert.match(xml, /image\/jpeg/)
+    } finally {
+      await reader.close()
+    }
+  }
+})
 
 const runtime: DrawingRuntime = {
   canvas: () => createCanvas(1, 1) as unknown as HTMLCanvasElement,
@@ -343,8 +436,6 @@ test('ODT rejects an empty sheet and respects cancellation', async () => {
 })
 
 test('DOCX exports editable two-column tables, linked images, A4 geometry and page breaks', async () => {
-  const { exportPhotoSheetDocx } =
-    await import('../src/libs/photo-sheet/docx.ts')
   for (const photosPerPage of [2, 4, 6] as const) {
     const sheet = fixture(7)
     sheet.photosPerPage = photosPerPage
@@ -430,8 +521,6 @@ test('DOCX exports editable two-column tables, linked images, A4 geometry and pa
 })
 
 test('DOCX rejects empty input and cancellation before or during export', async () => {
-  const { exportPhotoSheetDocx } =
-    await import('../src/libs/photo-sheet/docx.ts')
   await assert.rejects(exportPhotoSheetDocx(fixture(0), {}, runtime), /至少/)
   const aborted = new AbortController()
   aborted.abort()
