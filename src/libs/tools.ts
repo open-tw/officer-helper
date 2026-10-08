@@ -76,6 +76,12 @@ export const TOOL_GROUPS: ToolGroup[] = [
     title: '圖片工具',
     tools: [
       {
+        to: '/img/extract',
+        title: '文件圖片擷取',
+        description: '擷取並預覽 DOCX、ODT 文件內的圖片',
+        icon: ImageRegular,
+      },
+      {
         to: '/img/compressor',
         title: '圖片壓縮',
         description: '縮小照片檔案大小，方便夾帶在信件或上傳系統',
