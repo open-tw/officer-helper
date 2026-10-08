@@ -6,16 +6,24 @@
 
 ## 工具一覽
 
-| 工具           | 路徑               | 說明                                                   |
-| -------------- | ------------------ | ------------------------------------------------------ |
-| QR Code 產生器 | `/qr-code`         | 輸入網址或文字產生 QR Code，可選容錯率，下載成 PNG     |
-| 壓一起         | `/zip`             | 選取或拖曳多個檔案，打包成單一 `.zip` 下載             |
-| 圖片壓縮       | `/img/compressor`  | 批次縮小圖片檔案大小，可單張下載或打包成 `.zip`        |
-| 圖片浮水印     | `/img/watermark`   | 加入文字浮水印，可選大小、透明度與角度，即時預覽並下載 |
-| 照片佐證表     | `/img/photo-sheet` | 照片排序與簡短說明，匯出兩欄 A4 的 PDF／ODT／DOCX      |
-| XLS 轉換       | `/export/xls`      | 把舊版 Excel 的 `.xls` 轉成 `.xlsx`、`.ods` 或 `.csv`  |
-| 海報分割列印   | `/pdf/poster`      | 將 PDF 放大成 2／4／8 張 A4 或 A3，列印後拼貼          |
-| PDF 合併       | `/pdf/merge`       | 整份合併，或預覽並選擇指定頁面、調整順序後下載         |
+| 工具           | 路徑               | 說明                                                                     |
+| -------------- | ------------------ | ------------------------------------------------------------------------ |
+| QR Code 產生器 | `/qr-code`         | 輸入網址、文字或 Wi-Fi 資訊，可選容錯率，下載 PNG／SVG 或複製圖片        |
+| 壓一起         | `/zip`             | 選取或拖曳多個檔案，打包成單一 `.zip` 下載                               |
+| 圖片壓縮       | `/img/compressor`  | 批次縮小圖片檔案大小，可單張下載或打包成 `.zip`                          |
+| 圖片浮水印     | `/img/watermark`   | 加入文字浮水印，可選大小、透明度與角度，即時預覽並下載                   |
+| 文件圖片擷取   | `/img/extract`     | 擷取並預覽 DOCX／ODT 內的圖片，可單張下載或勾選打包 ZIP                  |
+| 照片佐證表     | `/img/photo-sheet` | 照片排序、旋轉與簡短說明，每頁 2／4／6 張，匯出兩欄 A4 的 PDF／ODT／DOCX |
+| XLS 轉換       | `/export/xls`      | 批次把 `.xls` 轉成 `.xlsx`、`.ods` 或 `.csv`，多檔打包 ZIP               |
+| 海報分割列印   | `/pdf/poster`      | 將 PDF 放大成 2／4／8 張 A4 或 A3，列印後拼貼                            |
+| PDF 合併       | `/pdf/merge`       | 整份合併，或預覽並選擇指定頁面、調整順序後下載                           |
+
+使用注意事項：
+
+- QR Code 複製圖片功能需瀏覽器支援；無法複製時可改用下載。
+- 文件圖片擷取會以原始格式下載圖片，擷取順序可能與文件中的排列不同。
+- XLS 轉換選擇 CSV 時，僅輸出每個檔案的第一個工作表，不保留格式。
+- 照片佐證表可選擇完整顯示照片或置中裁切填滿。
 
 ## 開發
 
@@ -63,7 +71,7 @@ node --experimental-strip-types --test tests/pdf-merge.test.ts
 
 > `xlsx` 這個套件是從 SheetJS 官方 CDN 安裝（不是 npm registry），這是官方建議的做法。若建置環境無法連外或使用內部 registry，需要先處理這個依賴。
 
-> `browser-image-compression` 在 Web Worker 內預設會從 jsDelivr 載入自己。本專案已改為載入站內副本（`src/routes/img/compressor.tsx` 的 `libURL`），因此執行時不會對外連線，內網環境也能正常運作。
+> `browser-image-compression` 在 Web Worker 內預設會從 jsDelivr 載入自己。本專案已改為載入站內副本（`src/routes/img/compressor.tsx` 的 `libURL`），因此圖片壓縮的 Worker 不再依賴外部 CDN。這不代表網站已支援完整離線開啟；使用時仍需能載入網站及必要資產。
 
 ## 專案結構
 
@@ -76,12 +84,15 @@ src/
 │   ├── zip.tsx
 │   ├── img/compressor.tsx
 │   ├── img/watermark.tsx
+│   ├── img/extract.tsx
 │   ├── img/photo-sheet.tsx
 │   ├── pdf/poster.tsx
 │   ├── pdf/merge.tsx
 │   └── export/xls.tsx
 ├── components/              # 跨頁共用元件（PageIntro、ColorPickerPopup）
+│   └── document-extract/    # 文件選取與圖片預覽、勾選及下載介面
 ├── libs/
+│   ├── document-extract/    # DOCX／ODT 圖片擷取與 ZIP 打包下載
 │   ├── photo-sheet/         # 表單資料、共用排版與可擴充的匯出介面
 │   ├── tools.ts             # 工具清單的單一來源，首頁讀這裡
 │   ├── pdf-merge.ts         # PDF 讀取、指定頁面合併與輸出
